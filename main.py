@@ -34,6 +34,7 @@ async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
             options=["Io", "Non io"],
             disable_notification=True,
             allows_multiple_answers=False,
+            is_anonymous=False,
         )
     except Exception as e:
         logger.error(f"Error sending message: {e}")
