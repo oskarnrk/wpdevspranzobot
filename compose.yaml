@@ -1,0 +1,7 @@
+services:
+  remindmebot:
+    image: wpdevspranzobot:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Rome
+    env_file: .env
