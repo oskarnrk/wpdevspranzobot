@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 class Settings(BaseSettings):
     CHAT_ID: int = Field(default=...)
     TELEGRAM_TOKEN: str = Field(default=...)
+    HOURS: int = Field(default=...)
+    MINUTES: int = Field(default=...)
 
 
 async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
@@ -48,8 +50,8 @@ async def main():
             remind_pranzo_tomorrow,
             kwargs={"bot": bot, "chat_id": settings.CHAT_ID},
             trigger="cron",
-            hour=20,
-            minute=46,
+            hour=settings.HOURS,
+            minute=settings.MINUTES,
             timezone="Europe/Rome",
             day_of_week="mon-fri",
         )
