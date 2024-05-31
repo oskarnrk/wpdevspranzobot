@@ -55,7 +55,7 @@ async def main():
             hour=settings.HOURS,
             minute=settings.MINUTES,
             timezone="Europe/Rome",
-            day_of_week="mon-fri",
+            day_of_week="sun-thu",
         )
         scheduler.start()
         while True:
