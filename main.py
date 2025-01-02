@@ -31,7 +31,7 @@ async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
         await bot.send_poll(
             chat_id=chat_id,
             question="Dove mangerai domani? 🍝",
-            options=["Ufficio", "Mensa", "Home office"],
+            options=["Ufficio", "Mensa", "Home office", "Ferie/permesso"],
             disable_notification=True,
             allows_multiple_answers=False,
             is_anonymous=False,
