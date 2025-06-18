@@ -24,13 +24,19 @@ class Settings(BaseSettings):
     TELEGRAM_TOKEN: str = Field(default=...)
     HOURS: int = Field(default=...)
     MINUTES: int = Field(default=...)
+    IT_PROVINCE: str = Field(default=...)
 
 
 async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
     """Handler to send to chat message for pranzo tomorrow."""
-    it_holidays = holidays.IT(prov="BZ")
 
-    # Check if tomorrow is a holiday in Italy (province of Bolzano).
+    # Check if tomorrow is a holiday in Italy (in the specified province if set).
+    # Province codes can be found at https://holidays.readthedocs.io/en/latest/
+    if settings.IT_PROVINCE:
+        it_holidays = holidays.IT(prov=settings.IT_PROVINCE)
+    else:
+        it_holidays = holidays.IT()
+
     tomorrow = (await bot.get_me()).date + timedelta(days=1)
     if tomorrow in it_holidays:
         logger.info("Tomorrow is a holiday, not sending poll.")
