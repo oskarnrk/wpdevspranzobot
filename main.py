@@ -2,6 +2,7 @@
 
 import asyncio
 import contextlib
+import holidays
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -27,6 +28,14 @@ class Settings(BaseSettings):
 
 async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
     """Handler to send to chat message for pranzo tomorrow."""
+    it_holidays = holidays.IT(prov="BZ")
+
+    # Check if tomorrow is a holiday in Italy (province of Bolzano).
+    tomorrow = (await bot.get_me()).date + timedelta(days=1)
+    if tomorrow in it_holidays:
+        logger.info("Tomorrow is a holiday, not sending poll.")
+        return
+
     try:
         await bot.send_poll(
             chat_id=chat_id,
