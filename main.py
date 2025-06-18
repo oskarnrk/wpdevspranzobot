@@ -6,6 +6,7 @@ import holidays
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import date
 from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -24,22 +25,31 @@ class Settings(BaseSettings):
     TELEGRAM_TOKEN: str = Field(default=...)
     HOURS: int = Field(default=...)
     MINUTES: int = Field(default=...)
-    IT_PROVINCE: str = Field(default=...)
+    IT_PROVINCE: str = Field(default=None)
+    CUSTOM_SKIP_DATES: str = Field(default=None)
 
 
 async def remind_pranzo_tomorrow(bot: Bot, chat_id: str) -> None:
     """Handler to send to chat message for pranzo tomorrow."""
 
-    # Check if tomorrow is a holiday in Italy (in the specified province if set).
+    # Check if tomorrow is a holiday in Italy (in the specified province if set)
     # Province codes can be found at https://holidays.readthedocs.io/en/latest/
     if settings.IT_PROVINCE:
-        it_holidays = holidays.IT(prov=settings.IT_PROVINCE)
+        skip_dates = holidays.IT(prov=settings.IT_PROVINCE)
     else:
-        it_holidays = holidays.IT()
+        skip_dates = holidays.IT()
+
+    # Add custom skip dates if provided
+    if settings.CUSTOM_SKIP_DATES: # dates in format "%m-%d"
+        custom_skip_dates = settings.CUSTOM_SKIP_DATES.split(",")
+        for date_str in custom_skip_dates:
+            day, month = map(int, date_str.split("-"))
+            custom_date = date(year=date.today().year, month=month, day=day)
+            skip_dates.append(custom_date.strftime("%d-%m-%Y"))
 
     tomorrow = (await bot.get_me()).date + timedelta(days=1)
-    if tomorrow in it_holidays:
-        logger.info("Tomorrow is a holiday, not sending poll.")
+    if tomorrow in skip_dates:
+        logger.info("Tomorrow is in the skip days list, not sending poll.")
         return
 
     try:
